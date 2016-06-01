@@ -115,12 +115,11 @@ input {
           "message" => "2016-06-01 12:52:41,129 DEBUG base zmq.auth 
                         PID: 1230  ZAP reply code=200 text=OK",
          "@version" => "1",
-       "@timestamp" => "2016-06-01T12:52:41.182Z",
+       "@timestamp" => "2016-06-01T12:52:41.129Z",
              "host" => "dauvmfes001.repositpower.net",
              "path" => "/var/log/apps/SecureTSDBProxy.stderr.log",
-             "type" => "cc_python", 
+             "type" => "python", 
           "program" => "SecureTSDBProxy",
-        "timestamp" => "2016-06-01 12:52:41,129",
          "loglevel" => "DEBUG",
            "module" => "base",
            "logger" => "zmq.auth",  
@@ -195,11 +194,16 @@ output {
 \section{ELK setups}
 \begin{frame}
 \frametitle{Distributed}
+Logstash + Elasticsearch + Kibana
 \end{frame}
 
 \section{ELK setups}
 \begin{frame}
 \frametitle{Centralized}
+\begin{enumerate}
+    \item Logstash forwarder/Filebeat + Redis + Logstash + Elasticsearch + Kibana
+    \item Rsyslog forwarder + Rsyslog master + Logstash + Elasticsearch + Kibana
+\end{enumerate}
 \end{frame}
 
 \section{Alerting from these reports}
