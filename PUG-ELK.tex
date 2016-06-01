@@ -1,0 +1,247 @@
+\documentclass[13pt, ignorenonframetext]{beamer}
+%\documentclass[13pt, handout, notes, gray]{beamer}
+%\usepackage{handoutWithNotes}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{2 on 1 with notes landscape}[a4paper,border shrink=5mm]
+
+\usetemplatenote{{\footnotesize \begin{quote} \insertnote \end{quote}}}
+
+\usepackage[utf8]{inputenc}
+\usepackage{parskip}
+\usepackage{url}
+\usepackage{listings}
+\usetheme{AnnArbor}
+\setbeamertemplate{navigation symbols}{}
+\institute[PUG@Canberra]{PUG Meetup   \\
+Canberra}
+
+\title[Centralised logfile analysis using ELK]{Centralised logfile analysis using Elastic, Logstash and Kibana (ELK)}
+\author[Tomas Krajca]{Tomas Krajca \\{\tiny $\langle tomas@repositpower.com \rangle$}}
+\date{\today}
+
+\newcommand{\comment}[1]{}
+
+\begin{document}
+
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%These should provide a summary of (a) your initial problem specification; (b) relevant related work and background sources; (c) the approach you took to solving the problem; and (d) the outcomes of your work.
+% 20 mins
+
+\section{Outline}
+\frame
+{
+  \frametitle{Today}
+  \begin{enumerate}
+  \item Reporting state of (python) programs.
+  \item Storing these reports.
+  \item Processing/indexing these reports.
+  \item Searching/analyzing these reports.
+  \item Elasticsearch.
+  \item Kibana.
+  \item ELK setups.
+  \item Alerting from these reports.
+  \item Lessons learned.
+  \item QA.
+  \end{enumerate}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Reporting state of (python) programs}
+\begin{frame}
+\frametitle{Why and how?}
+\begin{enumerate}
+\item example1.py
+\item example2.py
+\item example3.py
+\item example4.py
+\item logging.ini
+\item https://docs.python.org/2/library/logging.html
+\item https://docs.python.org/2/library/logging.config.html
+\end{enumerate}
+\end{frame}
+
+
+\section{Storing these reports}
+\begin{frame}[fragile]
+\frametitle{Logstash inputs}
+      \begin{columns}[c] % contents are top vertically aligned
+     \begin{column}{2.3cm} % each column can also be its own environment
+\begin{enumerate}
+\item File
+\item AWS S3
+\item Console
+\item Rsyslog
+\item Heroku
+\item ...
+\end{enumerate}
+     \end{column}
+     \begin{column}{6.7cm} % alternative top-align that's better for graphics
+\begin{lstlisting}[basicstyle=\footnotesize]
+input {
+  file {
+    type => "python"
+    path => 
+      ["/var/log/apps/app.stderr.log"]
+    add_field => [ "program", "app" ]
+    sincedb_path => 
+      "/var/lib/logstash/sincedb"
+  }
+}
+\end{lstlisting}
+     \end{column}
+     \end{columns}
+
+\end{frame}
+
+
+\section{Processing/indexing these reports.}
+\begin{frame}
+\frametitle{Logstash filters}
+\begin{enumerate}
+\item logstash.conf
+\item https://github.com/elastic/logstash/blob/v1.4.2/patterns/grok-patterns
+\end{enumerate}
+\end{frame}
+
+\section{Processing/indexing these reports.}
+\begin{frame}[fragile]
+\frametitle{Logstash filters}
+\begin{lstlisting}[basicstyle=\scriptsize]
+{
+          "message" => "2016-06-01 12:52:41,129 DEBUG base zmq.auth 
+                        PID: 1230  ZAP reply code=200 text=OK",
+         "@version" => "1",
+       "@timestamp" => "2016-06-01T12:52:41.182Z",
+             "host" => "dauvmfes001.repositpower.net",
+             "path" => "/var/log/apps/SecureTSDBProxy.stderr.log",
+             "type" => "cc_python", 
+          "program" => "SecureTSDBProxy",
+        "timestamp" => "2016-06-01 12:52:41,129",
+         "loglevel" => "DEBUG",
+           "module" => "base",
+           "logger" => "zmq.auth",  
+      "received_at" => "2016-06-01T12:52:41.182Z",
+    "received_from" => "dauvmfes001",
+     "@source_host" => "dauvmfes001",
+         "@message" => "ZAP reply code=200 text=OK",
+             "tags" => [
+        [0] "_parsed"
+    ]
+}
+\end{lstlisting}
+\end{frame}
+
+\section{Searching/analyzing these reports}
+\begin{frame}[fragile]
+\frametitle{Logstash outputs}
+      \begin{columns}[c] % contents are top vertically aligned
+     \begin{column}{3.0cm} % each column can also be its own environment
+\begin{enumerate}
+\item Zabbix
+\item Redis
+\item Elasticsearch
+\end{enumerate}
+     \end{column}
+     \begin{column}{6.0cm} % alternative top-align that's better for graphics
+\begin{lstlisting}[basicstyle=\scriptsize]
+output {
+  if "zabbix" in [tags] {
+    zabbix {
+      host => "zabbix.repositpower.net"
+      port => "10051"
+      zabbix_sender => 
+        "/usr/bin/zabbix_sender_retry"
+    }
+  }
+  elasticsearch {
+    host => "search.repositpower.net"
+    protocol => "http"
+    flush_size => 1000
+    max_retries => 7
+  }
+}
+\end{lstlisting}
+     \end{column}
+     \end{columns}
+\end{frame}
+
+
+\section{Elasticsearch}
+\begin{frame}
+\frametitle{NoSQL database}
+\begin{enumerate}
+\item NoSQL database
+\item full-text search
+\item index, insert and query examples in python
+\item index, insert and query examples in curl
+\item elasticsearch-curator
+\end{enumerate}
+\end{frame}
+
+\section{Kibana}
+\begin{frame}
+\frametitle{Demo}
+\begin{enumerate}
+\item Search.
+\item Filter.
+\item Analyze.
+\end{enumerate}
+\end{frame}
+
+\section{ELK setups}
+\begin{frame}
+\frametitle{Distributed}
+\end{frame}
+
+\section{ELK setups}
+\begin{frame}
+\frametitle{Centralized}
+\end{frame}
+
+\section{Alerting from these reports}
+\begin{frame}
+\frametitle{Bosun}
+\begin{enumerate}
+\item response time alert
+\item too many warnings/errors alert
+\item anomaly alert (number of errors)
+\end{enumerate}
+\end{frame}
+
+\section{Lessons learned}
+\begin{frame}
+\frametitle{Tips \& tricks}
+\begin{enumerate}
+\item python logging with multiprocessing
+\item advantages of async logging
+\item multiline logstash codec being stuck/old alerts
+\item HW resources for logstash and elasticsearch
+\item queuing in logstash when elaslticsearch is down
+\item consensus on meaning of log levels for alerting
+\item educate on how to use kibana
+\item bosun very young/rough
+\item python stacktraces in the logs
+\item SIGUSR1/SIGUSR2
+\item logstash testing/debugging (rubydebug)
+\end{enumerate}
+\end{frame}
+
+
+%%%
+\frame[plain]
+{
+	\begin{center}
+	 \textbf{\Large{Questions/discussion}}
+\vskip2cm
+	\textbf{\Large{Thank you}}
+\vskip2cm
+	\textit{tomas@repositpower.com}\\
+    https://github.com/tkrajca/PUG-ELK
+	\end{center}
+}
+
+\end{document}
