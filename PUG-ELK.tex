@@ -11,6 +11,7 @@
 \usepackage{url}
 \usepackage{listings}
 \usetheme{AnnArbor}
+
 \setbeamertemplate{navigation symbols}{}
 \institute[PUG@Canberra]{PUG Meetup   \\
 Canberra}
@@ -40,8 +41,6 @@ Canberra}
   \item Storing these reports.
   \item Processing/indexing these reports.
   \item Searching/analyzing these reports.
-  \item Elasticsearch.
-  \item Kibana.
   \item ELK setups.
   \item Alerting from these reports.
   \item Lessons learned.
@@ -51,6 +50,16 @@ Canberra}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Reporting state of (python) programs}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}
 \frametitle{Why and how?}
 \begin{enumerate}
@@ -66,10 +75,18 @@ Canberra}
 
 
 \section{Storing these reports}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}[fragile]
-\frametitle{Logstash inputs}
-      \begin{columns}[c] % contents are top vertically aligned
-     \begin{column}{2.3cm} % each column can also be its own environment
+\frametitle{Log storage}
 \begin{enumerate}
 \item File
 \item AWS S3
@@ -78,8 +95,55 @@ Canberra}
 \item Heroku
 \item ...
 \end{enumerate}
-     \end{column}
-     \begin{column}{6.7cm} % alternative top-align that's better for graphics
+\end{frame}
+
+
+\section{Processing/indexing these reports.}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+\begin{frame}[fragile]
+\frametitle{Logs}
+\begin{verbatim}
+2016-06-02 00:21:06,705 DEBUG connectionpool requests.packages.urllib3.connectionpool PID: 1360  "POST /api/query HTTP/1.1" 200 None
+2016-06-02 00:21:06,706 DEBUG worker worker0.55 PID: 1360  Response: [{"metric":"operational.australia.nem.ec.customer.load.P","tags":{"source":"CSIRO-2"},"aggregateTags":[],"dps":{"1401581400":0.09135883301496506,"1401581404":0.33968567848205566,"1401581700":0.11657682061195374,"1401581704":0.3968915045261383,"1401582000": ...
+2016-06-02 00:21:06,707 INFO master stsdb_proxy.master PID: 1230  worker0.55 returned 405B for client ^@J
+2016-06-02 00:21:07,910 DEBUG master stsdb_proxy.master PID: 1230  Received ['1464826867', '\xdc\xa2\x01@r0\xeb\x0f%\xded\xfa\x94GI\x91\xb8O\xcc6\x00B\x11\x00\xf0N\x00\nwrite\x00\xcc\x04\x00Toperational.australia.nem.ec.meter.voltage\x02\xac\xee\xfb\xf4\n\x9a\x19{C\x02\nphase\x06red\x00\x00bonB\x00\x10inver\x01E,reques']... from client ^@: (testec001)
+2016-06-02 00:21:07,910 INFO master stsdb_proxy.master PID: 1230  Proxied 3229B from client ^@: (testec001) to worker0.55
+2016-06-02 00:21:07,962 DEBUG worker worker0.55 PID: 1360  POSTing [{"timestamp":1464826774,"metric":"operational.australia.nem.ec.meter.voltage","value":251.1000061035,"tags":{"phase":"red"... to http://dtsdb.repositpower.net/api/put?details
+2016-06-02 00:21:07,972 DEBUG connectionpool requests.packages.urllib3.connectionpool PID: 1360  "POST /api/put?details HTTP/1.1" 200 None
+2016-06-02 00:21:07,974 INFO master stsdb_proxy.master PID: 1230  worker0.55 returned 12B for client ^@:
+2016-06-02 00:21:07,998 DEBUG base zmq.auth PID: 1230  version: '1.0', request_id: '1', domain: u'', address: u'172.16.22.38', identity: '', mechanism: 'CURVE'
+2016-06-02 00:21:07,998 DEBUG base zmq.auth PID: 1230  ALLOWED (CURVE) domain=* client_key=6V8>9Y(yBGgg)Uyu}V-s*jKbB3KU9&Ku+T]-Z!(z
+2016-06-02 00:21:07,998 DEBUG zmq_ zmq.auth PID: 1230  Authenticated user `c9cce94a1cf344fd8913978528baae21'
+2016-06-02 00:21:07,998 DEBUG base zmq.auth PID: 1230  ZAP reply code=200 text=OK
+...
+\end{verbatim}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Logstash}
+\begin{enumerate}
+    \item Tool that crunches logs/reports.
+    \item Configurable to process any sorts of logs.
+    \item Ruby/java.
+    \item Collect - Process - Forward events/messages.
+    \item Input(s) - Filter(s) - Output(s).
+    \item https://www.elastic.co/products/logstash
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Logstash inputs}
 \begin{lstlisting}[basicstyle=\footnotesize]
 input {
   file {
@@ -92,13 +156,9 @@ input {
   }
 }
 \end{lstlisting}
-     \end{column}
-     \end{columns}
-
 \end{frame}
 
 
-\section{Processing/indexing these reports.}
 \begin{frame}
 \frametitle{Logstash filters}
 \begin{enumerate}
@@ -107,7 +167,7 @@ input {
 \end{enumerate}
 \end{frame}
 
-\section{Processing/indexing these reports.}
+
 \begin{frame}[fragile]
 \frametitle{Logstash filters}
 \begin{lstlisting}[basicstyle=\scriptsize]
@@ -134,7 +194,18 @@ input {
 \end{lstlisting}
 \end{frame}
 
+
 \section{Searching/analyzing these reports}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}[fragile]
 \frametitle{Logstash outputs}
       \begin{columns}[c] % contents are top vertically aligned
@@ -143,6 +214,7 @@ input {
 \item Zabbix
 \item Redis
 \item Elasticsearch
+\item ...
 \end{enumerate}
      \end{column}
      \begin{column}{6.0cm} % alternative top-align that's better for graphics
@@ -169,35 +241,70 @@ output {
 \end{frame}
 
 
-\section{Elasticsearch}
 \begin{frame}
-\frametitle{NoSQL database}
+\frametitle{Elasticsearch}
 \begin{enumerate}
-\item NoSQL database
-\item full-text search
-\item index, insert and query examples in python
-\item index, insert and query examples in curl
-\item elasticsearch-curator
+\item NoSQL database.
+\item Scalable, robust, powerful.
+\item Full-text search server built on Lucene indexes.
+\item (JSON) Schema free.
+\item HTTP/JSON or TCP API/interface
+\item Java
+\item Indexes - Databases
+\item https://www.elastic.co/
 \end{enumerate}
 \end{frame}
 
-\section{Kibana}
+
 \begin{frame}
-\frametitle{Demo}
+\frametitle{Elasticsearch demo}
 \begin{enumerate}
-\item Search.
-\item Filter.
-\item Analyze.
+\item Python client libraries. 
+\item https://pypi.python.org/pypi/elasticsearch/2.3.0
+\item http://search.repositpower.net:9200/
+\item http://search.repositpower.net:9200/\_cat/indices?v
+\item curl -d '{"loglevel": "INFO", "@message":"Tomas Krajca2"}' http://search.repositpower.net:9200/test/2/\_update
+\item http://search.repositpower.net:9200/logstash-2016.06.02/\_search?q=
+      @message:"timed out"\&pretty=true
+\item \$ curator show indices --all-indices
 \end{enumerate}
 \end{frame}
+
+\begin{frame}
+\frametitle{Kibana}
+\begin{enumerate}
+\item Data visualization and search for elasticsearch.
+\item https://www.elastic.co/products/kibana
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Kibana demo}
+\begin{enumerate}
+\item time\_duration:[3000 TO *] AND http\_request:*
+\item bytes\_read:[3000 TO *] AND http\_request:*
+\item loglevel:ERROR OR loglevel:WARNING AND @message:timeout AND NOT @message:Unable
+\end{enumerate}
+\end{frame}
+
 
 \section{ELK setups}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}
 \frametitle{Distributed}
-Logstash + Elasticsearch + Kibana
+%Logstash + Elasticsearch + Kibana
 \end{frame}
 
-\section{ELK setups}
 \begin{frame}
 \frametitle{Centralized}
 \begin{enumerate}
@@ -207,6 +314,16 @@ Logstash + Elasticsearch + Kibana
 \end{frame}
 
 \section{Alerting from these reports}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}
 \frametitle{Bosun}
 \begin{enumerate}
@@ -217,6 +334,16 @@ Logstash + Elasticsearch + Kibana
 \end{frame}
 
 \section{Lessons learned}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 \begin{frame}
 \frametitle{Tips \& tricks}
 \begin{enumerate}
@@ -231,6 +358,7 @@ Logstash + Elasticsearch + Kibana
 \item python stacktraces in the logs
 \item SIGUSR1/SIGUSR2
 \item logstash testing/debugging (rubydebug)
+\item Correlation IDs
 \end{enumerate}
 \end{frame}
 
