@@ -68,8 +68,8 @@ Canberra}
 \item example3.py
 \item example4.py
 \item logging.ini
-\item https://docs.python.org/2/library/logging.html
-\item https://docs.python.org/2/library/logging.config.html
+\item \url{https://docs.python.org/2/library/logging.html}
+\item \url{https://docs.python.org/2/library/logging.config.html}
 \end{enumerate}
 \end{frame}
 
@@ -137,7 +137,7 @@ Canberra}
     \item Ruby/java.
     \item Collect - Process - Forward events/messages.
     \item Input(s) - Filter(s) - Output(s).
-    \item https://www.elastic.co/products/logstash
+    \item \url{https://www.elastic.co/products/logstash}
 \end{enumerate}
 \end{frame}
 
@@ -163,8 +163,8 @@ input {
 \frametitle{Logstash filters}
 \begin{enumerate}
 \item logstash.conf
-\item https://github.com/elastic/logstash/blob/v1.4.2/patterns/grok-patterns
-\item \$ logstash -v -f ~/logstash.conf
+\item \url{https://github.com/elastic/logstash/blob/v1.4.2/patterns/grok-patterns}
+\item \$ logstash -v -f logstash.conf
 \end{enumerate}
 \end{frame}
 
@@ -252,7 +252,7 @@ output {
 \item HTTP/JSON or TCP API/interface
 \item Java
 \item Indexes - Databases
-\item https://www.elastic.co/
+\item \url{https://www.elastic.co/}
 \end{enumerate}
 \end{frame}
 
@@ -261,12 +261,11 @@ output {
 \frametitle{Elasticsearch demo}
 \begin{enumerate}
 \item Python client libraries. 
-\item https://pypi.python.org/pypi/elasticsearch/2.3.0
-\item http://search.repositpower.net:9200/
-\item http://search.repositpower.net:9200/\_cat/indices?v
-\item curl -d '{"loglevel": "INFO", "@message":"Tomas Krajca2"}' http://search.repositpower.net:9200/test/2/\_update
-\item http://search.repositpower.net:9200/logstash-2016.06.02/\_search?q=
-      @message:"timed out"\&pretty=true
+\item \url{https://pypi.python.org/pypi/elasticsearch/2.3.0}
+\item \url{http://search.repositpower.net:9200/}
+\item \url{http://search.repositpower.net:9200/\_cat/indices?v}
+\item curl -d '{"loglevel": "INFO", "@message":"Tomas Krajca2"}' \url{http://search.repositpower.net:9200/test/2/\_update}
+\item \url{http://search.repositpower.net:9200/logstash-2016.06.02/\_search?q=@message:"timed out"\&pretty=true}
 \item \$ curator show indices --all-indices
 \end{enumerate}
 \end{frame}
@@ -275,7 +274,7 @@ output {
 \frametitle{Kibana}
 \begin{enumerate}
 \item Data visualization and search for elasticsearch.
-\item https://www.elastic.co/products/kibana
+\item \url{https://www.elastic.co/products/kibana}
 \end{enumerate}
 \end{frame}
 
@@ -283,9 +282,9 @@ output {
 \begin{frame}
 \frametitle{Kibana demo}
 \begin{enumerate}
-\item time\_duration:[3000 TO *] AND http\_request:*
-\item bytes\_read:[3000 TO *] AND http\_request:*
-\item loglevel:ERROR OR loglevel:WARNING AND @message:timeout AND NOT @message:Unable
+\item \url{time\_duration:[3000 TO *] AND http\_request:*}
+\item \url{bytes\_read:[3000 TO *] AND http\_request:*}
+\item \url{loglevel:ERROR OR loglevel:WARNING AND @message:timeout AND NOT @message:Unable}
 \end{enumerate}
 \end{frame}
 
@@ -366,9 +365,9 @@ output {
 \frametitle{Bosun demo}
 \begin{enumerate}
 \item bosun.conf
-\item $ max(lsstat("logstash", "backend\_name,server\_name", "program:haproxy,http\_request:.*", "time\_duration", "max", "10s", "5m", "")) > 5000 $
-\item lscount("logstash", "@source\_host,program", "loglevel:error", "60s", "3h", "")
-\item lscount("logstash", "server\_name,backend\_name", "program:haproxy,http\_request:.*", "1h", "3d", "")
+\item \url{max(lsstat("logstash", "backend\_name,server\_name", "program:haproxy,http\_request:.*", "time\_duration", "max", "10s", "5m", "")) > 5000}
+\item \url{lscount("logstash", "@source\_host,program", "loglevel:error", "60s", "3h", "")}
+\item \url{lscount("logstash", "server\_name,backend\_name", "program:haproxy,http\_request:.*", "1h", "3d", "")}
 \item Response time alert in rule editor
 \item Anomaly-based alerting, alert aggregation.
 \end{enumerate}
@@ -412,7 +411,7 @@ output {
 	\textbf{\Large{Thank you}}
 \vskip2cm
 	\textit{tomas@repositpower.com}\\
-    https://github.com/tkrajca/PUG-ELK
+    \url{https://github.com/tkrajca/PUG-ELK}
 	\end{center}
 }
 
