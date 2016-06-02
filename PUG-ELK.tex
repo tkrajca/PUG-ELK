@@ -41,7 +41,7 @@ Canberra}
   \item Storing these reports.
   \item Processing/indexing these reports.
   \item Searching/analyzing these reports.
-  \item ELK setups.
+  \item ELK pipelines.
   \item Alerting from these reports.
   \item Lessons learned.
   \item QA.
@@ -164,6 +164,7 @@ input {
 \begin{enumerate}
 \item logstash.conf
 \item https://github.com/elastic/logstash/blob/v1.4.2/patterns/grok-patterns
+\item \$ logstash -v -f ~/logstash.conf
 \end{enumerate}
 \end{frame}
 
@@ -289,7 +290,7 @@ output {
 \end{frame}
 
 
-\section{ELK setups}
+\section{ELK pipelines}
 \AtBeginSection[]{
   \begin{frame}
   \vfill
@@ -302,16 +303,42 @@ output {
 }
 \begin{frame}
 \frametitle{Distributed}
-%Logstash + Elasticsearch + Kibana
+\begin{enumerate}
+\item Logstash + Elasticsearch + Kibana
+\end{enumerate}
+\begin{figure}
+\centering
+\includegraphics[width=11.0cm]{images/distributed-elk.png}
+\end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Centralized}
 \begin{enumerate}
+    \item Logstash + Redis + Logstash + Elasticsearch + Kibana
     \item Logstash forwarder/Filebeat + Redis + Logstash + Elasticsearch + Kibana
     \item Rsyslog forwarder + Rsyslog master + Logstash + Elasticsearch + Kibana
 \end{enumerate}
+\begin{figure}
+\centering
+\includegraphics[width=8.5cm]{images/centralized-elk.png}
+\end{figure}
+
 \end{frame}
+
+
+\begin{frame}
+\frametitle{Considerations}
+\begin{enumerate}
+    \item Complexity.
+    \item How much logging on each node.
+    \item How strict SLAs for each service.
+    \item How reliable should it be.
+    \item How fast/real-time should it be.
+    \item Who does the hard work.
+\end{enumerate}
+\end{frame}
+
 
 \section{Alerting from these reports}
 \AtBeginSection[]{
@@ -327,11 +354,26 @@ output {
 \begin{frame}
 \frametitle{Bosun}
 \begin{enumerate}
-\item response time alert
-\item too many warnings/errors alert
-\item anomaly alert (number of errors)
+\item Monitoring and alerting system by Stack Exchange.
+\item Flexible language to define alerts and notifications.
+\item Supports OpenTSDB, Graphite, Elasticsearch, InFlux, ... as backend dbs.
+\item https://bosun.org
 \end{enumerate}
 \end{frame}
+
+
+\begin{frame}
+\frametitle{Bosun demo}
+\begin{enumerate}
+\item bosun.conf
+\item $ max(lsstat("logstash", "backend\_name,server\_name", "program:haproxy,http\_request:.*", "time\_duration", "max", "10s", "5m", "")) > 5000 $
+\item lscount("logstash", "@source\_host,program", "loglevel:error", "60s", "3h", "")
+\item lscount("logstash", "server\_name,backend\_name", "program:haproxy,http\_request:.*", "1h", "3d", "")
+\item Response time alert in rule editor
+\item Anomaly-based alerting, alert aggregation.
+\end{enumerate}
+\end{frame}
+
 
 \section{Lessons learned}
 \AtBeginSection[]{
@@ -347,18 +389,16 @@ output {
 \begin{frame}
 \frametitle{Tips \& tricks}
 \begin{enumerate}
-\item python logging with multiprocessing
-\item advantages of async logging
-\item multiline logstash codec being stuck/old alerts
-\item HW resources for logstash and elasticsearch
-\item queuing in logstash when elaslticsearch is down
-\item consensus on meaning of log levels for alerting
-\item educate on how to use kibana
-\item bosun very young/rough
-\item python stacktraces in the logs
-\item SIGUSR1/SIGUSR2
-\item logstash testing/debugging (rubydebug)
-\item Correlation IDs
+\item Python logging with multiprocessing - avoid files.
+\item Advantages of non-blocking/async logging.
+\item Don't use multiline logstash input codec.
+\item HW resources for logstash and elasticsearch.
+\item Event queuing in logstash when elaslticsearch is down.
+\item Consensus on meaning of log levels for alerting.
+\item Educate staff on using kibana/tools.
+\item Never silence python stacktraces.
+\item SIGUSR1/SIGUSR2/setupLogging() hooks for dropping logging level, dumping threads and more :).
+\item Correlation IDs.
 \end{enumerate}
 \end{frame}
 
